@@ -1,0 +1,37 @@
+{
+  "name": "pathshala",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.13.5",
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.7.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "google-auth-library": "^10.5.0",
+    "http": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.3",
+    "mailgen": "^2.0.29",
+    "mongoose": "^8.18.0",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.6",
+    "nodemon": "^3.1.10",
+    "slugify": "^1.6.6",
+    "socket.io": "^4.8.1",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "autocannon": "^8.0.0"
+  }
+}
