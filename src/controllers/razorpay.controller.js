@@ -80,5 +80,6 @@ export const verifyPayment = async (req, res) => {
       message: "Payment verified successfully",
       courseId: purchase.courseId,
     });
+    
   } catch (error) {}
 };
