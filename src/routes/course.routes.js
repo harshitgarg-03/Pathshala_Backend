@@ -1,4 +1,5 @@
 import { Router } from "express";
+import {createRazorpayOrder, verifyPayment} from "../controllers/razorpay.controller.js"
 import {
   createCourse,
   updateCourse,
@@ -38,4 +39,7 @@ router.post(
 );
 router.post("/createSection/:courseId", auth, addSection);
 router.get("/get-published-courses", auth, getPublishedCourse);
+
+router.post("/create-order", auth, createRazorpayOrder)
+router.post("/verifyPaymnet", auth, verifyPayment)
 export default router;
