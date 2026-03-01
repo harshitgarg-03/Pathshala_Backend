@@ -6,7 +6,7 @@ import {
   deleteCourse,
   getAllCourse,
   getCourse,
-  addSection,
+  addSection, 
   addLecture,
   updateSection,
   updateLecture,
