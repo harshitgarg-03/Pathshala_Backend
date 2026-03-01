@@ -80,4 +80,4 @@ CoursePurchaseSchema.methods.processRefund= async function(reason, amount) {
     return this.save();
 }
 
-export const coursePurchase = mongoose.models.Course-purchase || mongoose.model("Course-purchase", CoursePurchaseSchema);
+export const coursePurchase = mongoose.models.Coursepurchase || mongoose.model("Coursepurchase", CoursePurchaseSchema);
