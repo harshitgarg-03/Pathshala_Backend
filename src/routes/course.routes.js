@@ -1,18 +1,22 @@
-import { Router } from "express";
-import {createRazorpayOrder, verifyPayment} from "../controllers/razorpay.controller.js"
+import express, { Router } from "express";
+import {
+  createCheckoutSession,
+  verifyPayment,
+} from "../controllers/razorpay.controller.js";
 import {
   createCourse,
   updateCourse,
   deleteCourse,
   getAllCourse,
   getCourse,
-  addSection, 
+  addSection,
   addLecture,
   updateSection,
   updateLecture,
   deleteLecture,
   deleteSection,
-  getPublishedCourse
+  getPublishedCourse,
+  getPurchasedCourse,
 } from "../controllers/course.controller.js";
 import {
   ValidationMiddleware,
@@ -24,7 +28,12 @@ import { upload } from "../middlewares/multerMiddleware.middlewares.js";
 const router = Router();
 
 router.post("/createCourse", auth, upload.single("thumbnail"), createCourse);
-router.put("/updateCourse/:courseId", auth, upload.single("thumbnail"), updateCourse);
+router.put(
+  "/updateCourse/:courseId",
+  auth,
+  upload.single("thumbnail"),
+  updateCourse,
+);
 router.delete("/deleteCourse/:courseId", deleteCourse);
 router.get("/getallCourse", auth, getAllCourse);
 
@@ -39,7 +48,6 @@ router.post(
 );
 router.post("/createSection/:courseId", auth, addSection);
 router.get("/get-published-courses", auth, getPublishedCourse);
-
-router.post("/create-order", auth, createRazorpayOrder)
-router.post("/verifyPaymnet", auth, verifyPayment)
+router.post("/create-order", auth, createCheckoutSession);
+router.get("/getPurchasedCourse", auth, getPurchasedCourse);
 export default router;
