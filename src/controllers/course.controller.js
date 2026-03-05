@@ -7,6 +7,8 @@ import {
   SectionModel,
 } from "../models/course.model.js";
 import { uploadOnCloud } from "../services/fileUploder.services.js";
+import { coursePurchase } from "../models/course.purchase.js";
+
 
 export const createCourse = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -56,7 +58,7 @@ export const getCourse = asyncHandler(async (req, res) => {
   const {
     search, //title
     category,
-    level,
+    level, 
     language,
     minPrice,
     maxPrice,
@@ -427,3 +429,32 @@ export const getPublishedCourse = asyncHandler(async (req, res) => {
     ),
   );
 });
+
+export const getPurchasedCourse = asyncHandler(async (req, res) => {
+  const filter = { status: "succeeded", user: req.user._id};
+  const purchasedCourse = await coursePurchase.find(filter).populate(
+    {path: "course",
+      select: "title description discount thumbnail price reviews averageRating _id sections",
+      populate: {
+        path: "sections",
+        select: "title _id lectures",
+        populate: {
+          path: "lectures",
+          select: "title, +videoUrl"
+        }
+      }
+    })
+    console.log(purchasedCourse);
+    
+  //console.log("purchase course backend", JSON.stringify(purchasedCourse[0].course, null, 2));
+  
+  
+  return res.status(200).json(
+    new ApiResponse(200, 
+      purchasedCourse
+    ,
+    "Purchased course Fetched success "
+  )
+  )
+});
+
