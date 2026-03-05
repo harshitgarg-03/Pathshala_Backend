@@ -2,7 +2,85 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import { CourseModel } from "../models/course.model.js";
 import { coursePurchase } from "../models/course.purchase.js";
+import { Stripe } from "stripe"
 
+export const stripes = new Stripe(process.env.STRIPE_KEY_SECRET);
+
+export const createCheckoutSession = async (req, res) => {
+  try {
+    const userId = req.user;
+    const { course } = req.body;
+    
+    const existCourse = await CourseModel.findById(course._id);
+    if (!existCourse) return res.status(404).json({ message: "Course Not found" });
+
+    const seesion = await stripes.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+
+      line_items: [
+        {
+          price_data: {
+            currency: "INR",
+            product_data: {
+              name: existCourse.title,
+            },
+            unit_amount: existCourse.price*100
+          },
+          quantity: 1,
+        },
+      ],
+
+      success_url: "http://localhost:5173/success",
+      cancel_url: "http://localhost:5173/cancel",
+
+      metadata: {
+        courseId: String(existCourse._id),
+        userId: String(req.user._id)
+      }
+
+    });
+    res.json({ url: seesion.url})
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export const verifyPayment = async (req, res) => {
+  const signature = req.headers["stripe-signature"];
+  let event;
+  
+  try {
+    event = stripes.webhooks.constructEvent(
+      req.body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET 
+    );
+    console.log("STATUS: try", event);
+  } catch (error) {    
+    return res.status(400).send(`Webhook Error: ${error.message}`);
+  }  
+  if(event.type === "checkout.session.completed"){
+    const session = event.data.object;
+
+    const courseId = session.metadata.courseId;
+    const userId = session.metadata.userId;
+
+    await coursePurchase.create({
+      course: courseId,
+      user: userId,
+      paymentId: session.payment_intent,
+      amount: session.amount_total,
+      currency: session.currency,
+      paymentMethod: session.payment_method_types[0],
+      status: session.status
+    })
+  }
+  res.json({ received: true, dataStripe: event });
+}
+
+// RAZORPAY PAYMENT METHOD 
+/*
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRTE,
@@ -10,9 +88,12 @@ const razorpay = new Razorpay({
 
 export const createRazorpayOrder = async (req, res) => {
   try {
-    const userId = req.id;
+    const userId = req.user;
     const { courseId } = req.body;
+    console.log("id", courseId);
+    
     const course = await CourseModel.findById(courseId);
+    console.log("course model", course);
     if (!course) return res.status(404).json({ message: "Course Not found" });
 
     const newPurchase = new coursePurchase({
@@ -83,3 +164,4 @@ export const verifyPayment = async (req, res) => {
     
   } catch (error) {}
 };
+*/
