@@ -27,7 +27,7 @@ const CoursePurchaseSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ["pending", "completed", "failed", "refunded"],
+        values: ["pending", "succeeded", "failed", "refunded"],
         message: "Please select a valid status ",
       },
       default: "pending",
