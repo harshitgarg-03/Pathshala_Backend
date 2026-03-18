@@ -41,7 +41,7 @@ export const googleCallback = async (req, res) => {
     },
   );
 
-  console.log("user logged in", googleRes.data);
+  // console.log("user logged in", googleRes.data);
   
   const { email, name, picture } = googleRes.data;
 
@@ -74,7 +74,7 @@ export const googleCallback = async (req, res) => {
   .status(200)
   .cookie("accessToken", accessToken, options)
   .cookie("refreshToken", refreshToken, options)
-  .redirect(`http://localhost:5173/oauth?token=${accessToken}`);
+  .redirect(`http://localhost:5173/`);
 };
 
 const generateAccessAndRefreshToken = async (userId) => {
