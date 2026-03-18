@@ -17,6 +17,7 @@ import {
   deleteSection,
   getPublishedCourse,
   getPurchasedCourse,
+  GetEnrolledCourse,
 } from "../controllers/course.controller.js";
 import {
   ValidationMiddleware,
@@ -47,7 +48,8 @@ router.post(
   addLecture,
 );
 router.post("/createSection/:courseId", auth, addSection);
-router.get("/get-published-courses", auth, getPublishedCourse);
+router.get("/get-published-courses", getPublishedCourse);
 router.post("/create-order", auth, createCheckoutSession);
 router.get("/getPurchasedCourse", auth, getPurchasedCourse);
+router.get("/getEnrollCourse", auth, GetEnrolledCourse);
 export default router;
