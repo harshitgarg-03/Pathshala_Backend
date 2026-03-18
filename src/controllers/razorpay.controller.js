@@ -56,7 +56,7 @@ export const verifyPayment = async (req, res) => {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET 
     );
-    console.log("STATUS: try", event);
+    // console.log("STATUS: try", event);
   } catch (error) {    
     return res.status(400).send(`Webhook Error: ${error.message}`);
   }  
@@ -65,7 +65,9 @@ export const verifyPayment = async (req, res) => {
 
     const courseId = session.metadata.courseId;
     const userId = session.metadata.userId;
-
+    console.log("hello 1");
+    console.log("seession status", session.status);
+    
     await coursePurchase.create({
       course: courseId,
       user: userId,
@@ -73,8 +75,11 @@ export const verifyPayment = async (req, res) => {
       amount: session.amount_total,
       currency: session.currency,
       paymentMethod: session.payment_method_types[0],
-      status: session.status
+      status: session.status,
+      isPurchased: true,
     })
+    console.log("hello 2");
+    
   }
   res.json({ received: true, dataStripe: event });
 }
