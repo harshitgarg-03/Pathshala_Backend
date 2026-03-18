@@ -8,7 +8,8 @@ import {
 } from "../models/course.model.js";
 import { uploadOnCloud } from "../services/fileUploder.services.js";
 import { coursePurchase } from "../models/course.purchase.js";
-
+import { auth } from "../middlewares/authMiddleware.middlewares.js";
+import { UserModel } from "../models/user.model.js";
 
 export const createCourse = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -44,7 +45,7 @@ export const createCourse = asyncHandler(async (req, res) => {
     category,
     level,
     status,
-    thumbnail: thumbnailUrl?.url,
+    thumbnail: thumbnailUrl?.secure_url,
     instructor: user._id,
   });
 
@@ -58,7 +59,7 @@ export const getCourse = asyncHandler(async (req, res) => {
   const {
     search, //title
     category,
-    level, 
+    level,
     language,
     minPrice,
     maxPrice,
@@ -186,12 +187,13 @@ export const getAllCourse = asyncHandler(async (req, res) => {
 
 export const updateCourse = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
-  
+
   const course = await CourseModel.findById(courseId);
   if (!course) throw new ApiError(400, "Course not found.");
 
-  const { title, description, price, category, level, language, status } = req.body;
-  
+  const { title, description, price, category, level, language, status } =
+    req.body;
+
   // console.log(
   //   "backend data ",
   //   title,
@@ -208,7 +210,7 @@ export const updateCourse = asyncHandler(async (req, res) => {
     course.thumbnail = thumbnail.url;
     // console.log(thumbnail);
   }
-  
+
   if (title) course.title = title;
   if (description) course.description = description;
   if (language) course.language = language;
@@ -228,7 +230,7 @@ export const updateCourse = asyncHandler(async (req, res) => {
 export const deleteCourse = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
   console.log("del", courseId);
-  
+
   const course = await CourseModel.findById(courseId);
   if (!course) throw new ApiError(400, "Course not found.");
 
@@ -431,30 +433,62 @@ export const getPublishedCourse = asyncHandler(async (req, res) => {
 });
 
 export const getPurchasedCourse = asyncHandler(async (req, res) => {
-  const filter = { status: "succeeded", user: req.user._id};
-  const purchasedCourse = await coursePurchase.find(filter).populate(
-    {path: "course",
-      select: "title description discount thumbnail price reviews averageRating _id sections",
+  console.log("hello purchase");
+  
+  const filter = { status: "complete", user: req.user._id };
+  const purchasedCourse = await coursePurchase.find(filter).populate({
+    path: "course",
+    select:
+      "title description discount thumbnail price reviews averageRating _id sections",
+    populate: {
+      path: "sections",
+      select: "title _id lectures",
       populate: {
-        path: "sections",
-        select: "title _id lectures",
-        populate: {
-          path: "lectures",
-          select: "title, +videoUrl"
-        }
-      }
-    })
-    console.log(purchasedCourse);
-    
-  //console.log("purchase course backend", JSON.stringify(purchasedCourse[0].course, null, 2));
-  
-  
-  return res.status(200).json(
-    new ApiResponse(200, 
-      purchasedCourse
-    ,
-    "Purchased course Fetched success "
-  )
-  )
+        path: "lectures",
+        select: "title, +videoUrl",
+      },
+    },
+  });
+  // console.log(purchasedCourse);
+
+  console.log("purchase course backend", JSON.stringify(purchasedCourse[0].course, null, 2));
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        purchasedCourse,
+        "Purchased course Fetched success ",
+      ),
+    );
 });
 
+export const GetEnrolledCourse = async (req, res) => {
+  const user = req.user._id;
+  // console.log("user is ", user);
+
+  try {
+    const usercontent = await UserModel.findById(user);
+    // console.log("usre is ", usercontent.enrolledCourse);
+
+    if (!usercontent) {
+      console.log("user not found !");
+      return;
+    }
+    // console.log("end controller ", usercontent);
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          usercontent.enrolledCourse,
+          "enrolled course Fetched success ",
+        ),
+      );
+  } catch (error) {
+    console.log("something went wrong to fetch enrolled course ");
+    return error;
+  }
+};
