@@ -32,6 +32,7 @@
     "slugify": "^1.6.6",
     "socket.io": "^4.8.1",
     "stripe": "^20.4.0",
+    "vercel": "^32.3.0",
     "zod": "^4.1.5"
   },
   "devDependencies": {
