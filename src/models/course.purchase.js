@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { UserModel } from "./user.model.js";
+import { CourseModel } from "./course.model.js";
 
 const CoursePurchaseSchema = new mongoose.Schema(
   {
@@ -27,10 +29,15 @@ const CoursePurchaseSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ["pending", "succeeded", "failed", "refunded"],
+        values: ["pending", "succeeded", "failed", "refunded", "complete"],
         message: "Please select a valid status ",
       },
       default: "pending",
+    },
+
+    isPurchased: {
+      type: Boolean,
+      default: false,
     },
 
     paymentMethod: {
@@ -62,22 +69,35 @@ const CoursePurchaseSchema = new mongoose.Schema(
   },
 );
 
+CoursePurchaseSchema.index({ user: 1, course: 1 });
+CoursePurchaseSchema.index({ status: 1 });
+CoursePurchaseSchema.index({ createdAt: -1 });
 
-CoursePurchaseSchema.index({user:1, course:1})
-CoursePurchaseSchema.index({status: 1})
-CoursePurchaseSchema.index({createdAt : -1})
+CoursePurchaseSchema.virtual("isRefundable").get(function () {
+  if (this.status !== "completed") return false;
+  const ThirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  return this.createdAt > ThirtyDaysAgo;
+});
 
-CoursePurchaseSchema.virtual('isRefundable').get(function() {
-    if(this.status !== 'completed') return false;
-    const ThirtyDaysAgo = new Date(Date.now() - 30*24*60*60*1000)
-    return this.createdAt > ThirtyDaysAgo;
-})
+CoursePurchaseSchema.methods.processRefund = async function (reason, amount) {
+  ((this.status = "refunded"),
+    (this.reason = reason),
+    (this.refundAmount = amount || this.amount));
+  return this.save();
+};
 
-CoursePurchaseSchema.methods.processRefund= async function(reason, amount) {
-    this.status = "refunded",
-    this.reason = reason,
-    this.refundAmount = amount || this.amount
-    return this.save();
-}
+CoursePurchaseSchema.post("save", async function (){
+  
+  await UserModel.findByIdAndUpdate(this.user, {
+    $push: { enrolledCourse: this.course }
+  }, {new: true});
 
-export const coursePurchase = mongoose.models.Coursepurchase || mongoose.model("Coursepurchase", CoursePurchaseSchema);
+  await CourseModel.findByIdAndUpdate(this.course, {
+    $push: {enrollStudents: this.user}
+  }, {new: true})
+});
+
+
+export const coursePurchase =
+  mongoose.models.Coursepurchase ||
+  mongoose.model("Coursepurchase", CoursePurchaseSchema);
