@@ -14,9 +14,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.get("/", {
-  message : "successed backend "
-})
+app.get("/", (req, res) => {
+  res.json({
+    message: "Hello, from server"
+  })
+});
 app.post(
   "/stripe/webhook",
   express.raw({ type: "application/json" }),
