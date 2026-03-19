@@ -1,8 +1,10 @@
-import Razorpay from "razorpay";
-import crypto from "crypto";
+import dotenv from 'dotenv';
+import "dotenv/config";
+dotenv.config();
 import { CourseModel } from "../models/course.model.js";
 import { coursePurchase } from "../models/course.purchase.js";
-import { Stripe } from "stripe"
+import { Stripe } from "stripe";
+
 
 const STRIPE_KEY_SECRET = process.env.STRIPE_KEY_SECRET;
 
