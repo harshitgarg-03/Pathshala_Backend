@@ -4,6 +4,7 @@
     {
       "src": "/(.*)",
       "dest": "./src/server.js"
-    }
+    }, 
+    { "src": "/api/v1/auth(.*)", "dest": "./src/server.js" }
   ]
 }
