@@ -4,6 +4,10 @@ import { CourseModel } from "../models/course.model.js";
 import { coursePurchase } from "../models/course.purchase.js";
 import { Stripe } from "stripe"
 
+const STRIPE_KEY_SECRET = process.env.STRIPE_KEY_SECRET;
+
+if (!STRIPE_KEY_SECRET) throw new Error("Stripe Key is not found");
+
 export const stripes = new Stripe(process.env.STRIPE_KEY_SECRET);
 
 export const createCheckoutSession = async (req, res) => {
