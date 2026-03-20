@@ -8,6 +8,8 @@ cloudinary.config({
 });
 
 export const uploadOnCloud = async (filePath) => {
+    console.log("FILE:: ", filePath);
+    
   try {
     if (!filePath) return null;
 
