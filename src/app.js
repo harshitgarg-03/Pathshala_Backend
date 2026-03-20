@@ -8,6 +8,7 @@ import authRouter from "./routes/auth.routes.js";
 import courseRouter from "./routes/course.routes.js";
 
 import { verifyPayment } from "./controllers/razorpay.controller.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
