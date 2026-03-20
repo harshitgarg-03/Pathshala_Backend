@@ -8,18 +8,22 @@ cloudinary.config({
 });
 
 export const uploadOnCloud = async (filePath) => {
+  try {
+    if (!filePath) return null;
+
+    const res = await cloudinary.uploader.upload(filePath);
+
+    return res;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    // 🔥 ALWAYS DELETE
     try {
-        if(!filePath) return null;
-
-        const res = await cloudinary.uploader.upload(filePath, {
-            resource_type: "auto"
-        });
-
-        return res;
-    } catch (error) {
+      if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        console.log("CLOUD: ", error);
-        
-        console.error(error);
+      }
+    } catch (err) {
+      console.log("Cleanup error:", err);
     }
+  }
 };
