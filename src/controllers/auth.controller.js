@@ -74,7 +74,7 @@ export const googleCallback = async (req, res) => {
   .status(200)
   .cookie("accessToken", accessToken, options)
   .cookie("refreshToken", refreshToken, options)
-  .redirect(`http://localhost:5173/`);
+  .redirect(`https://pathshal-fr.onrender.com/`);
 };
 
 const generateAccessAndRefreshToken = async (userId) => {
