@@ -23,8 +23,8 @@ app.post(
   express.raw({ type: "application/json" }),
   verifyPayment,
 );
-app.use(express.json());
-app.use(express.urlencoded({ extended: true, }));
+app.use(express.json({limit: "50mb"}));
+app.use(express.urlencoded({ extended: true, limit: "50mb"}));
 app.use(cookiesParse());
 
 // cors confifrations
