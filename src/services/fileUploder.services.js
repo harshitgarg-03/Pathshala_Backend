@@ -13,7 +13,9 @@ export const uploadOnCloud = async (filePath) => {
   try {
     if (!filePath) return null;
 
-    const res = await cloudinary.uploader.upload(filePath);
+    const res = await cloudinary.uploader.upload(filePath, {
+      resource_type: "auto"
+    });
     console.log(res.url);
     return res;
   } catch (error) {
