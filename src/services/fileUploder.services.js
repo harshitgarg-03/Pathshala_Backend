@@ -14,10 +14,10 @@ export const uploadOnCloud = async (filePath) => {
     if (!filePath) return null;
 
     const res = await cloudinary.uploader.upload(filePath);
-
+    console.log(res.url);
     return res;
   } catch (error) {
-    console.error(error);
+    console.error("ERRO in Upload file::", error);
   } finally {
     // 🔥 ALWAYS DELETE
     try {
