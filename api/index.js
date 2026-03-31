@@ -1,15 +1,24 @@
-import dotenv from 'dotenv';
-import "dotenv/config";
-dotenv.config();
 import app from "../src/app.js";
 import { connectDB } from "../src/config/db.js";
-connectDB()
-  .then(() => {
-    
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error: ", err);
-    process.exit(1);
-  });
 
-export default app;
+let isConnected = false;
+
+async function connect() {
+  if (isConnected) return;
+
+  try {
+    await connectDB();
+    isConnected = true;
+    console.log("✅ DB Connected");
+  } catch (err) {
+    console.error("❌ DB Error:", err);
+  }
+}
+
+export default async function handler(req, res) {
+  console.log("🔥 REQUEST HIT:", req.url);
+
+  await connect();
+
+  return app(req, res);
+}
