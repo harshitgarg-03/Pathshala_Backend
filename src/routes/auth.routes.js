@@ -13,9 +13,9 @@ router.route("/refresh-token").post(refreshAccessToken);
 router.route("/forgot-password").post(forgotPassword);
 router.route("/reset-password/:resetToken").post(passwordValidator, resetForgotPassword);
 router.route("/google").get(googleAuth)
-router.route("/get/me").get(auth, getCurrentUser);
 router.route("/google/callback").get(googleCallback)
 // protected route
+router.route("/get/me").get(auth, getCurrentUser);
 router.route("/logout").post(auth, logoutUser);
 // router.route("/current-user").get(auth, getCurrentUser);
 router.route("/changed-password").post(passwordValidator, auth, changeCurrentPassword);

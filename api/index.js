@@ -16,8 +16,6 @@ async function connect() {
 }
 
 export default async function handler(req, res) {
-  console.log("🔥 REQUEST HIT:", req.url);
-
   await connect();
 
   return app(req, res);

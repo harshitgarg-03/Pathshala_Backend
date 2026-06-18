@@ -15,7 +15,8 @@ export const createCourse = asyncHandler(async (req, res) => {
   const user = req.user;
   const { title, description, price, category, level, language, status } =
     req.body;
-
+    console.log("req.body :: ", req.body);
+  
   let thumbnailUrl = null;
 
   if (req.file?.path) {
