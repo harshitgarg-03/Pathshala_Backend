@@ -67,8 +67,8 @@ export const googleCallback = async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   };
   res
   .status(200)
@@ -177,8 +177,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
-    sameSite: "none"
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   };
 
   return res
@@ -306,7 +306,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     };
 
     const { accessToken, refreshToken: newRefreshToken } =
@@ -416,11 +417,14 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
 const UpdateProfile = asyncHandler(async (req, res) => {
   const {_id} = req.user;
-  const {firstname, lastname, email} = req.body;
+  const {firstname, lastname, email, role} = req.body;
 
   let update = {}
   if(email) {
     update.email = email;
+  }
+  if (role && ["student", "instructor", "admin"].includes(role)) {
+    update.role = role;
   }
   if(firstname && lastname) {
     

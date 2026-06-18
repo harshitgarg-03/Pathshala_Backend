@@ -4,23 +4,27 @@ import slugify from "slugify";
 const Schema = mongoose.Schema;
 
 async function calculateDuration(sectionId, courseId) {
+  const Section = mongoose.model("Section");
+  const Course = mongoose.model("Course");
+  const Lecture = mongoose.model("Lecture");
+
   // calulation of section model duration
-  const Lecture = await mongoose.model("Lecture").find({ sectionId });
-  const sectionDuration = Lecture.reduce(
-    (sum, lec) => sum + Number(lec.duration),
+  const lectures = await Lecture.find({ sectionId });
+  const sectionDuration = lectures.reduce(
+    (sum, lec) => sum + Number(lec.duration || 0),
     0,
   );
-  await SectionModel.findByIdAndUpdate(sectionId, {
+  await Section.findByIdAndUpdate(sectionId, {
     duration: sectionDuration,
   });
 
   // calulation of course model duration
-  const sections = await SectionModel.find({ courseId: courseId });
+  const sections = await Section.find({ courseId: courseId });
   const courseDuration = sections.reduce(
-    (sum, lec) => sum + (sections.duration || 0),
+    (sum, sec) => sum + (sec.duration || 0),
     0,
   );
-  await CourseModel.findByIdAndUpdate(courseId, { duration: courseDuration });
+  await Course.findByIdAndUpdate(courseId, { duration: courseDuration });
 }
 
 /* ---------------- Review Schema ---------------- */
@@ -235,5 +239,7 @@ CourseSchema.methods.updateAverageRating = async function () {
 /* ---------------- Models ---------------- */
 export const CourseModel =
   mongoose.models.Course || mongoose.model("Course", CourseSchema);
-export const SectionModel = mongoose.model("Section", SectionSchema);
-export const LectureModel = mongoose.model("Lecture", LectureSchema);
+export const SectionModel =
+  mongoose.models.Section || mongoose.model("Section", SectionSchema);
+export const LectureModel =
+  mongoose.models.Lecture || mongoose.model("Lecture", LectureSchema);

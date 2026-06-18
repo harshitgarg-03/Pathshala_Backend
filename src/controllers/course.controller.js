@@ -21,6 +21,9 @@ export const createCourse = asyncHandler(async (req, res) => {
 
   if (req.file?.path) {
     thumbnailUrl = await uploadOnCloud(req.file.path);
+    if (!thumbnailUrl) {
+      throw new ApiError(500, "Failed to upload thumbnail to Cloudinary!");
+    }
     console.log("thumb", thumbnailUrl.url);
   } else {
     throw new ApiError(400, "Thumbnail is required!");
@@ -158,7 +161,7 @@ export const getAllCourse = asyncHandler(async (req, res) => {
     .populate("instructor", "name email avatar")
     .populate({
       path: "sections",
-      select: "_id title description",
+      select: "_id title description lectures",
       populate: {
         path: "lectures",
       },
@@ -357,19 +360,19 @@ export const updateLecture = asyncHandler(async (req, res) => {
   if (!lectureId) throw new ApiError(404, "Lecture Id not found!");
 
   const update = {};
-  if (req.files.video[0].path) {
+  if (req.files?.video?.[0]?.path) {
     const videoUrl = await uploadOnCloud(req.files.video[0].path);
     update.videoUrl = videoUrl.url;
     update.videoPublicId = videoUrl.public_id;
   }
 
-  if (req.files.thumbnail[0].path) {
+  if (req.files?.thumbnail?.[0]?.path) {
     const thumbnail = await uploadOnCloud(req.files.thumbnail[0].path);
     update.thumbnail = thumbnail.url;
     update.thumbnailPublicId = thumbnail.public_id;
   }
 
-  if (req.files.pdf[0].path) {
+  if (req.files?.pdf?.[0]?.path) {
     const pdfUrl = await uploadOnCloud(req.files.pdf[0].path);
     update.resourceFiles = pdfUrl.url;
   }
@@ -407,7 +410,7 @@ export const getPublishedCourse = asyncHandler(async (req, res) => {
     .populate("instructor", "name email avatar")
     .populate({
       path: "sections",
-      select: "_id title description",
+      select: "_id title description lectures",
       populate: {
         path: "lectures",
       },
@@ -446,7 +449,7 @@ export const getPurchasedCourse = asyncHandler(async (req, res) => {
       select: "title _id lectures",
       populate: {
         path: "lectures",
-        select: "title, +videoUrl",
+        select: "title +videoUrl",
       },
     },
   });
