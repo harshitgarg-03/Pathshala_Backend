@@ -37,8 +37,8 @@ export const createCheckoutSession = async (req, res) => {
         },
       ],
 
-      success_url: "http://localhost:5173/success",
-      cancel_url: "http://localhost:5173/cancel",
+      success_url: "https://pathshal-fr.onrender.com/success",
+      cancel_url: "https://pathshal-fr.onrender.com/cancel",
 
       metadata: {
         courseId: String(existCourse._id),

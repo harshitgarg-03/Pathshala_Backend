@@ -94,6 +94,7 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
+  console.log("User registered");
   const { name, email, password } = req.validateData;
   const role = req.role;
   // avoid duplicate user
